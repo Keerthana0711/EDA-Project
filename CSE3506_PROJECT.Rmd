@@ -59,12 +59,32 @@ dim(dup)
 data = data[!duplicated(data), ]
 dim(data)
 ```
+## Converting categorical data into numerical data
 
+```{r}
+artists = data$artist
+#find number of values in artists
+length(artists)
+#find all unique values in artists
+unique_artists = unique(artists)
+length(unique_artists)
+#map all unique artists to a number
+artist_map = as.data.frame(unique_artists)
+artist_map$artist_id = 1:nrow(artist_map)
+head(artist_map)
+length(unique_artists)
+#replace artist names with artist ids
+data$artist = as.character(data$artist)
+for(i in 1:nrow(data)){
+  data$artist[i] = artist_map$artist_id[artist_map$unique_artists == data$artist[i]]
+}
+head(data)
+```
 ## Feature Selection
-
 ```{r}
 
 ```
+
 
 
 
