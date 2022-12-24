@@ -542,7 +542,9 @@ head(data_twentieth_1)</code></pre>
 ## 4      193043              4   29.52521        7      0
 ## 5      144244              4   24.99199        8      1
 ## 6      214320              4   32.17301       12      1</code></pre>
-<p>Combining all the dataframes into a single dataset</p>
+</div>
+<div id="combining-all-the-dataframes-into-a-single-dataset" class="section level2">
+<h2>Combining all the dataframes into a single dataset</h2>
 <pre class="r"><code>data = rbind(data_sixties, data_seventies, data_eighties, data_nineties, data_twentieth, data_twentieth_1)
 head(data)</code></pre>
 <pre><code>##                   track           artist                                  uri
@@ -573,7 +575,9 @@ head(data)</code></pre>
 ## 4   24.75484        8      0
 ## 5   21.79874       14      0
 ## 6   65.48604        7      0</code></pre>
-<p>Understanding the dataset</p>
+</div>
+<div id="understanding-the-dataset" class="section level2">
+<h2>Understanding the dataset</h2>
 <pre class="r"><code>dim(data)</code></pre>
 <pre><code>## [1] 41106    19</code></pre>
 <pre class="r"><code>str(data)</code></pre>

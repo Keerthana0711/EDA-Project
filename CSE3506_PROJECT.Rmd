@@ -28,18 +28,42 @@ head(data_twentieth)
 data_twentieth_1 = read.csv("dataset-of-10s.csv")
 head(data_twentieth_1)
 ```
-Combining all the dataframes into a single dataset
+## Combining all the dataframes into a single dataset
 
 ```{r}
 data = rbind(data_sixties, data_seventies, data_eighties, data_nineties, data_twentieth, data_twentieth_1)
 head(data)
 ```
-Understanding the dataset
+## Understanding the dataset
 
 ```{r}
 dim(data)
 str(data)
 summary(data)
 ```
+
+```{r}
+na_data = data[!complete.cases(data), ]
+dim(na_data)
+```
+From above, we can infer that there are no records with NA values
+
+```{r}
+#Checking for duplicate records
+dup = data[duplicated(data), ]
+dim(dup)
+```
+```{r}
+#Removing the duplicate values from dataset
+data = data[!duplicated(data), ]
+dim(data)
+```
+
+## Feature Selection
+
+```{r}
+
+```
+
 
 
