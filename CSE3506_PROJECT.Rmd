@@ -32,7 +32,8 @@ head(data_twentieth_1)
 
 ```{r}
 data = rbind(data_sixties, data_seventies, data_eighties, data_nineties, data_twentieth, data_twentieth_1)
-head(data)
+write.csv(data,"combined_data.csv")
+data = read.csv("combined_data.csv")
 ```
 ## Understanding the dataset
 
