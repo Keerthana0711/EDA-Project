@@ -80,6 +80,34 @@ for(i in 1:nrow(data)){
 }
 head(data)
 ```
+## Normalization
+
+```{r}
+data$artist=as.numeric(data$artist)
+```
+```{r}
+#Applying min-max normalization method
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+    #(x-mean(x))/sd(x)
+    #(x-(quantile(x)[2]))/((quantile(x)[4])-(quantile(x)[2]))
+}
+```
+```{r}
+data$loudness=round(min_max_normalisation(data$loudness),4)
+data$duration_ms=round(min_max_normalisation(data$duration_ms),4)
+data$tempo=round(min_max_normalisation(data$tempo),4)
+data$chorus_hit=round(min_max_normalisation(data$chorus_hit),4)
+```
+```{r}
+#Converting scientific to numeric values
+data$instrumentalness = format(data$instrumentalness,scientific = F)
+data$instrumentalness=round(as.double(substring(data$instrumentalness,1,8)),4)
+```
+```{r}
+head(data)
+```
+
 ## Feature Selection
 ```{r}
 
