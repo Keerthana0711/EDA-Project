@@ -1,0 +1,88 @@
+---
+title: "CSE3506_PROJECT"
+author: "KEERTHANA S_20BCE1049"
+date: "2022-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Predicting Hit Songs**
+
+## Dataset
+
+```{r}
+#Loading dataset
+data = read.csv("datasets/categ_to_num.csv")
+```
+```{r}
+```
+## Normalization
+
+```{r}
+data$artist=as.numeric(data$artist)
+```
+```{r}
+#Applying min-max normalization method
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+    #(x-mean(x))/sd(x)
+    #(x-(quantile(x)[2]))/((quantile(x)[4])-(quantile(x)[2]))
+}
+```
+```{r}
+data$loudness=round(min_max_normalisation(data$loudness),4)
+data$duration_ms=round(min_max_normalisation(data$duration_ms),4)
+data$tempo=round(min_max_normalisation(data$tempo),4)
+data$chorus_hit=round(min_max_normalisation(data$chorus_hit),4)
+```
+```{r}
+#Converting scientific to numeric values
+data$instrumentalness = format(data$instrumentalness,scientific = F)
+data$instrumentalness=round(as.double(substring(data$instrumentalness,1,8)),4)
+
+```
+```{r}
+write.csv(data,"datasets/normalized_data.csv",row.names = F)
+```
+head(data)
+```
+
+## Normalization of data with explicit column
+
+```{r}
+#Loading dataset
+data_explicit = read.csv("datasets/combined_data_explicit.csv")
+
+```
+
+```{r}
+data_explicit$artist=as.numeric(data_explicit$artist)
+```
+```{r}
+#Applying min-max normalization method
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+    #(x-mean(x))/sd(x)
+    #(x-(quantile(x)[2]))/((quantile(x)[4])-(quantile(x)[2]))
+}
+```
+```{r}
+data_explicit$loudness=round(min_max_normalisation(data_explicit$loudness),4)
+data_explicit$duration_ms=round(min_max_normalisation(data_explicit$duration_ms),4)
+data_explicit$tempo=round(min_max_normalisation(data_explicit$tempo),4)
+data_explicit$chorus_hit=round(min_max_normalisation(data_explicit$chorus_hit),4)
+```
+```{r}
+#Converting scientific to numeric values
+data_explicit$instrumentalness = format(data_explicit$instrumentalness,scientific = F)
+data_explicit$instrumentalness=round(as.double(substring(data_explicit$instrumentalness,1,8)),4)
+
+```
+```{r}
+write.csv(data_explicit,"datasets/normalized_explicit_data.csv",row.names = F)
+```
+
+

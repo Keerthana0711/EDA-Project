@@ -1,0 +1,40 @@
+---
+title: "CSE3506_PROJECT"
+author: "KEERTHANA S_20BCE1049"
+date: "2022-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Predicting Hit Songs**
+
+
+## Handle categorical data
+
+```{r}
+data = read.csv("datasets/categ_to_num.csv")
+head(data)
+explicit_data = read.csv("datasets/tracks_explicit2.csv")
+head(explicit_data)
+#get the entries from explicit_data whose id is in data$uri
+
+d_explicit = explicit_data[explicit_data$id %in% data$uri, ]
+d_data = data[data$uri %in% explicit_data$id , ]
+nrow(d_explicit)
+nrow(d_data)
+head(d)
+head(data)
+#make a column in data called explicit and take values from d$explicit mappping the id's
+d_data$explicit = 0
+for(i in 1:nrow(d_data)){
+  d_data$explicit[i] = d_explicit$explicit[d_explicit$id == d_data$uri[i]]
+}
+write.csv(d_data, "datasets/combined_data_explicit.csv", row.names = FALSE)
+```
+
+
+
+

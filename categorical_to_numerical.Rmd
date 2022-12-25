@@ -1,0 +1,56 @@
+---
+title: "CSE3506_PROJECT"
+author: "KEERTHANA S_20BCE1049"
+date: "2022-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Predicting Hit Songs**
+
+
+## Handle categorical data
+
+```{r}
+data = read.csv("datasets/combined_data.csv")
+artists = data$artist
+#find number of values in artists
+length(artists)
+#find all unique values in artists
+unique_artists = unique(artists)
+length(unique_artists)
+#map all unique artists to a number
+artist_map = as.data.frame(unique_artists)
+artist_map$artist_id = 1:nrow(artist_map)
+head(artist_map)
+length(unique_artists)
+#replace artist names with artist ids
+data$artist = as.character(data$artist)
+for(i in 1:nrow(data)){
+  data$artist[i] = artist_map$artist_id[artist_map$unique_artists == data$artist[i]]
+}
+head(data)
+data$uri = as.character(data$uri)
+for(i in 1:nrow(data)){
+  data$uri[i] = substr(data$uri[i], 15, nchar(data$uri[i]))
+}
+head(data)
+
+write.csv(data, "datasets/categ_to_num.csv", row.names = FALSE)
+```
+```
+```
+```{r}
+```
+
+## Feature Selection
+```{r}
+
+```
+
+
+
+

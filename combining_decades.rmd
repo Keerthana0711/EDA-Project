@@ -1,0 +1,61 @@
+---
+title: "CSE3506_PROJECT"
+author: "KEERTHANA S_20BCE1049"
+date: "2022-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Predicting Hit Songs**
+
+## Dataset
+
+```{r}
+#Loading dataset
+data_sixties = read.csv("raw_data/dataset-of-60s.csv")
+head(data_sixties)
+data_seventies = read.csv("raw_data/dataset-of-70s.csv")
+head(data_seventies)
+data_eighties = read.csv("raw_data/dataset-of-80s.csv")
+head(data_eighties)
+data_nineties = read.csv("raw_data/dataset-of-90s.csv")
+head(data_nineties)
+data_twentieth = read.csv("raw_data/dataset-of-00s.csv")
+head(data_twentieth)
+data_twentieth_1 = read.csv("raw_data/dataset-of-10s.csv")
+head(data_twentieth_1)
+```
+## Combining all the dataframes into a single dataset
+
+```{r}
+data = rbind(data_sixties, data_seventies, data_eighties, data_nineties, data_twentieth, data_twentieth_1)
+
+```
+## Understanding the dataset
+
+```{r}
+dim(data)
+str(data)
+summary(data)
+```
+
+```{r}
+na_data = data[!complete.cases(data), ]
+dim(na_data)
+```
+From above, we can infer that there are no records with NA values
+
+```{r}
+#Checking for duplicate records
+dup = data[duplicated(data), ]
+dim(dup)
+```
+```{r}
+#Removing the duplicate values from dataset
+data = data[!duplicated(data), ]
+dim(data)
+write.csv(data,"datasets/combined_data.csv", row.names = FALSE)
+```
