@@ -1,0 +1,1032 @@
+---
+title: "Decade-wise Analysis"
+author: "KEERTHANA S 20BCE1049"
+date: "2023-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+# **Reading the dataset**
+
+```{r}
+data = read.csv("datasets/normalized_data.csv")
+data = data[, c(-2, -3, -4)]
+head(data)
+```
+```{r}
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+}
+```
+
+# **Splitting dataset into decades**
+
+```{r}
+data = data[order(data$X), ]
+head(data)
+```
+```{r}
+sixties = data[1:8642, ]
+dim(sixties)
+```
+
+```{r}
+seventies = data[8643:16408, ]
+dim(seventies)
+```
+
+
+```{r}
+eighties = data[16409:23316, ]
+dim(eighties)
+```
+
+```{r}
+nineties = data[23317:28836, ]
+dim(nineties)
+```
+
+```{r}
+twentieth = data[28837:34708, ]
+dim(twentieth)
+```
+
+
+```{r}
+twentieth_1 = data[34709:41106, ]
+dim(twentieth_1)
+```
+# **Analysing the features of each decade**
+
+### **1960s**
+
+```{r}
+six = summary(sixties)
+six
+```
+
+### **1970s**
+
+```{r}
+seven = summary(seventies)
+seven
+```
+### **1980s**
+
+```{r}
+eight = summary(eighties)
+eight
+```
+### **1990s**
+
+```{r}
+nine = summary(nineties)
+nine
+```
+ 
+### **2000s**
+
+```{r}
+twenty = summary(twentieth)
+twenty
+```
+
+### **2010s**
+
+```{r}
+twentyone = summary(twentieth_1)
+twentyone
+```
+# **Analyzing the trend of values of different features over decades**
+
+```{r}
+artist_pop = c(mean(sixties$popularity),mean(seventies$popularity),mean(eighties$popularity),mean(nineties$popularity),mean(twentieth$popularity),mean(twentieth_1$popularity))
+instrumental = c(mean(sixties$instrumentalness),mean(seventies$instrumentalness),mean(eighties$instrumentalness),mean(nineties$instrumentalness),mean(twentieth$instrumentalness),mean(twentieth_1$instrumentalness))
+dance = c(mean(sixties$danceability),mean(seventies$danceability),mean(eighties$danceability),mean(nineties$danceability),mean(twentieth$danceability),mean(twentieth_1$danceability))
+energy = c(mean(sixties$energy),mean(seventies$energy),mean(eighties$energy),mean(nineties$energy),mean(twentieth$energy),mean(twentieth_1$energy))
+loud = c(mean(sixties$loudness),mean(seventies$loudness),mean(eighties$loudness),mean(nineties$loudness),mean(twentieth$loudness),mean(twentieth_1$loudness))
+mode = c(mean(sixties$mode),mean(seventies$mode),mean(eighties$mode),mean(nineties$mode),mean(twentieth$mode),mean(twentieth_1$mode))
+speech = c(mean(sixties$speechiness),mean(seventies$speechiness),mean(eighties$speechiness),mean(nineties$speechiness),mean(twentieth$speechiness),mean(twentieth_1$speechiness))
+acoustic = c(mean(sixties$acousticness),mean(seventies$acousticness),mean(eighties$acousticness),mean(nineties$acousticness),mean(twentieth$acousticness),mean(twentieth_1$acousticness))
+live = c(mean(sixties$liveness),mean(seventies$liveness),mean(eighties$liveness),mean(nineties$liveness),mean(twentieth$liveness),mean(twentieth_1$liveness))
+valence = c(mean(sixties$valence),mean(seventies$valence),mean(eighties$valence),mean(nineties$valence),mean(twentieth$valence),mean(twentieth_1$valence))
+tempo = c(mean(sixties$tempo),mean(seventies$tempo),mean(eighties$tempo),mean(nineties$tempo),mean(twentieth$tempo),mean(twentieth_1$tempo))
+duration = c(mean(sixties$duration_ms),mean(seventies$duration_ms),mean(eighties$duration_ms),mean(nineties$duration_ms),mean(twentieth$duration_ms),mean(twentieth_1$duration_ms))
+time_sig = c(mean(sixties$time_signature),mean(seventies$time_signature),mean(eighties$time_signature),mean(nineties$time_signature),mean(twentieth$time_signature),mean(twentieth_1$time_signature))
+genre = c(mean(sixties$genre),mean(seventies$genre),mean(eighties$genre),mean(nineties$genre),mean(twentieth$genre),mean(twentieth_1$genre))
+```
+
+```{r}
+x = c("1960-70", "1970-80", "1980-90", "1990-2000", "2000-10", "2010-20")
+```
+
+```{r}
+library(plotly)
+```
+
+
+```{r}
+data1 <- data.frame(x = x, y = artist_pop)
+
+fig1 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig1 <- fig1 %>% layout(title = "Popularity",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+
+```{r}
+data2 <- data.frame(x = x, y = instrumental)
+
+fig2 <- plot_ly(data2, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig2 <- fig2 %>% layout(title = "Instrumentalness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data3 <- data.frame(x = x, y = dance)
+
+fig3 <- plot_ly(data3, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig3 <- fig3 %>% layout(title = "Danceability",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data4 <- data.frame(x = x, y = speech)
+
+fig4 <- plot_ly(data4, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig4 <- fig4 %>% layout(title = "Speechiness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data5 <- data.frame(x = x, y = acoustic)
+
+fig5 <- plot_ly(data5, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig5 <- fig5 %>% layout(title = "Acousticness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data6 <- data.frame(x = x, y = live)
+
+fig6 <- plot_ly(data6, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig6 <- fig6 %>% layout(title = "Liveness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data7 <- data.frame(x = x, y = loud)
+
+fig7 <- plot_ly(data7, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig7 <- fig7 %>% layout(title = "Loudness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data8 <- data.frame(x = x, y = tempo)
+
+fig8 <- plot_ly(data8, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig8 <- fig8 %>% layout(title = "Tempo",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data9 <- data.frame(x = x, y = energy)
+
+fig9 <- plot_ly(data9, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig9 <- fig9 %>% layout(title = "Energy",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data10 <- data.frame(x = x, y = valence)
+
+fig10 <- plot_ly(data10, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig10 <- fig10 %>% layout(title = "Valence",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data11 <- data.frame(x = x, y = mode)
+
+fig11 <- plot_ly(data11, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig11 <- fig11 %>% layout(title = "Mode",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data12 <- data.frame(x = x, y = duration)
+
+fig12 <- plot_ly(data12, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig12 <- fig12 %>% layout(title = "Duration",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data13 <- data.frame(x = x, y = genre)
+
+fig13 <- plot_ly(data13, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig13 <- fig13 %>% layout(title = "Genre",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data14 <- data.frame(x = x, y = time_sig)
+
+fig14 <- plot_ly(data14, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c('steelblue', 'cornflowerblue',
+                                'navy', 'powderblue',
+                                'darkslateblue', 'lightskyblue')))
+fig14 <- fig14 %>% layout(title = "Time Signature",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+
+```{r}
+fig1
+fig2
+fig3
+fig4
+fig5
+fig6
+fig7
+fig8
+fig9
+fig10
+fig11
+fig12
+fig13
+fig14
+```
+
+
+
+
+
+
+
+
+
+
+# **Analyzing the influence of features on Hit of Song**
+
+```{r}
+library(caret)
+
+data_temp = data[, -17]
+data_temp = cbind(data_temp, target = data$target)
+data_temp = data_temp[, -1]
+
+```
+
+```{r}
+df <- data_temp
+
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "burlywood") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+```{r}
+df <- sixties
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "goldenrod") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+```{r}
+df <- seventies
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "yellowgreen") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+
+```{r}
+df <- eighties
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "yellowgreen") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+```{r}
+df <- nineties
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "gold2") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+```{r}
+df <- twentieth
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "yellow2") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+```{r}
+df <- twentieth_1
+df = df[, -1]
+Y = df$target
+df = df[, -16]
+df = cbind(df, target = Y)
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+class(df$target)
+```
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "orange") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+
+
+
+
+
+
+
+
+# **Analyzing the trend of popularity of Genres over Decades**
+
+
+
+```{r}
+genre_count = function(data){
+
+        # Group the songs by genre and calculate the count of songs with target as 1 in each group
+    genre_cnt <- aggregate(data$target, by=list(data$genre), FUN=function(x) sum(x==1))
+    # Create a vector to map the genre codes to names
+    genre_cnt = as.data.frame(genre_cnt)
+    genre_map <- c("ballad", "country", "dance pop", "edm", "indie", "jazz", "karaoke", "opm", "punk", "rap", "rb", "rock")
+    # Rename the columns for better readability
+    colnames(genre_cnt) <- c("Genre", "Count")
+    # Use the factor function to map the Genre column to genre names
+    genre_cnt$Genre <- factor(genre_cnt$Genre, levels = 1:12, labels = genre_map)
+    return(genre_cnt)
+
+}
+genre_analysis = function(data,decade){
+    # Get the genre count data
+    genre_data = genre_count(data)
+    #print(genre_data)
+    library(plotly)
+    library(scales)
+    # Calculate the percentage values
+    genre_data$Percent <- percent(genre_data$Count / sum(genre_data$Count))
+
+    # Create a vector of colors for the pie chart
+    colors <- c('#6d3678', '#368039', '#f7cbe4', '#CC79A7', '#84dbb2', '#c96da0', '#aadb84', '#73356d', '#84cf88', '#ba6dc9', '#abc96d', '#a7256c')
+
+    # Create the pie chart using ggplot2
+    plot_ly(data=genre_data,values=~Count,labels=~Genre, textposition="outside",textinfo = 'percent',
+    hoverinfo='label',outsidetextfont = list(color = 'midnightblue'), marker=list(colors=colors,
+    line=list(color="white",width=1)),type="pie") %>%
+    layout(title=decade)
+
+}
+
+genre_analysis(sixties,"1960-70")
+genre_analysis(seventies,"1970-80")
+genre_analysis(eighties,"1980-90")
+genre_analysis(nineties,"1990-2000")
+genre_analysis(twentieth,"2000-10")
+genre_analysis(twentieth_1,"2010-20")
+```
+
+# **Analyzing the trend of values of different features over decades for Hit Songs**
+
+
+
+```{r}
+sixties_hit=sixties[(sixties$target==1),]
+seventies_hit=seventies[(seventies$target==1),]
+eighties_hit=eighties[(eighties$target==1),]
+nineties_hit=nineties[(nineties$target==1),]
+twentieth_hit=twentieth[(twentieth$target==1),]
+twentieth_1_hit=twentieth_1[(twentieth_1$target==1),]
+
+```
+
+```{r}
+artist_pop = c(mean(sixties_hit$popularity),mean(seventies_hit$popularity),mean(eighties_hit$popularity),mean(nineties_hit$popularity),mean(twentieth_hit$popularity),mean(twentieth_1_hit$popularity))
+artist_pop
+instrumental = c(mean(sixties_hit$instrumentalness),mean(seventies_hit$instrumentalness),mean(eighties_hit$instrumentalness),mean(nineties_hit$instrumentalness),mean(twentieth_hit$instrumentalness),mean(twentieth_1_hit$instrumentalness))
+dance = c(mean(sixties_hit$danceability),mean(seventies_hit$danceability),mean(eighties_hit$danceability),mean(nineties_hit$danceability),mean(twentieth_hit$danceability),mean(twentieth_1_hit$danceability))
+energy = c(mean(sixties_hit$energy),mean(seventies_hit$energy),mean(eighties_hit$energy),mean(nineties_hit$energy),mean(twentieth_hit$energy),mean(twentieth_1_hit$energy))
+loud = c(mean(sixties_hit$loudness),mean(seventies_hit$loudness),mean(eighties_hit$loudness),mean(nineties_hit$loudness),mean(twentieth_hit$loudness),mean(twentieth_1_hit$loudness))
+mode = c(mean(sixties_hit$mode),mean(seventies_hit$mode),mean(eighties_hit$mode),mean(nineties_hit$mode),mean(twentieth_hit$mode),mean(twentieth_1_hit$mode))
+speech = c(mean(sixties_hit$speechiness),mean(seventies_hit$speechiness),mean(eighties_hit$speechiness),mean(nineties_hit$speechiness),mean(twentieth_hit$speechiness),mean(twentieth_1_hit$speechiness))
+acoustic = c(mean(sixties_hit$acousticness),mean(seventies_hit$acousticness),mean(eighties_hit$acousticness),mean(nineties_hit$acousticness),mean(twentieth_hit$acousticness),mean(twentieth_1_hit$acousticness))
+live = c(mean(sixties_hit$liveness),mean(seventies_hit$liveness),mean(eighties_hit$liveness),mean(nineties_hit$liveness),mean(twentieth_hit$liveness),mean(twentieth_1_hit$liveness))
+valence = c(mean(sixties_hit$valence),mean(seventies_hit$valence),mean(eighties_hit$valence),mean(nineties_hit$valence),mean(twentieth_hit$valence),mean(twentieth_1_hit$valence))
+tempo = c(mean(sixties_hit$tempo),mean(seventies_hit$tempo),mean(eighties_hit$tempo),mean(nineties_hit$tempo),mean(twentieth_hit$tempo),mean(twentieth_1_hit$tempo))
+duration = c(mean(sixties_hit$duration_ms),mean(seventies_hit$duration_ms),mean(eighties_hit$duration_ms),mean(nineties_hit$duration_ms),mean(twentieth_hit$duration_ms),mean(twentieth_1_hit$duration_ms))
+time_sig = c(mean(sixties_hit$time_signature),mean(seventies_hit$time_signature),mean(eighties_hit$time_signature),mean(nineties_hit$time_signature),mean(twentieth_hit$time_signature),mean(twentieth_1_hit$time_signature))
+genre = c(mean(sixties_hit$genre),mean(seventies_hit$genre),mean(eighties_hit$genre),mean(nineties_hit$genre),mean(twentieth_hit$genre),mean(twentieth_1_hit$genre))
+```
+
+```{r}
+x = c("1960-70", "1970-80", "1980-90", "1990-2000", "2000-10", "2010-20")
+```
+
+```{r}
+data1 <- data.frame(x = x, y = artist_pop)
+
+fig1 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig1 <- fig1 %>% layout(title = "Popularity",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data1 <- data.frame(x = x, y = instrumental)
+
+fig2 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig2 <- fig2 %>% layout(title = "Instrumentalness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = dance)
+
+fig3 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig3 <- fig3 %>% layout(title = "Dance",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = energy)
+
+fig4 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig4 <- fig4 %>% layout(title = "Energy",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+
+```
+```{r}
+data1 <- data.frame(x = x, y = loud)
+
+fig5 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig5 <- fig1 %>% layout(title = "Loudness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = mode)
+
+fig6 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig6 <- fig6 %>% layout(title = "Mode",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = speech)
+
+fig7 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig7 <- fig7 %>% layout(title = "Speechiness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = acoustic)
+
+fig8 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig8 <- fig8 %>% layout(title = "Acousticness",
+         xaxis = list(title = "Decades"),     yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = live)
+
+fig9 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig9 <- fig9 %>% layout(title = "Liveliness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = valence)
+
+fig9 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig9 <- fig9 %>% layout(title = "Valence",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = tempo)
+
+fig10 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig10 <- fig10 %>% layout(title = "Tempo",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = duration)
+
+fig11 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig11 <- fig11 %>% layout(title = "Duration",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = time_sig)
+
+fig12 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig12 <- fig12 %>% layout(title = "Time signature",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = genre)
+
+fig13 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c( "#DDA0DD", "#BA55D3", "#9370DB",
+                      "#8A2BE2", "#9400D3", "#4B0082")))
+fig13 <- fig13 %>% layout(title = "Genre",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+fig1
+fig2
+fig3
+fig4
+fig5
+fig6
+fig7
+fig8
+fig9
+fig10
+fig11
+fig12
+fig13
+```
+
+
+# **Analyzing the trend of values of different features over decades for miss Songs**
+
+
+```{r}
+sixties_miss=sixties[(sixties$target==0),]
+seventies_miss=seventies[(seventies$target==0),]
+eighties_miss=eighties[(eighties$target==0),]
+nineties_miss=nineties[(nineties$target==0),]
+twentieth_miss=twentieth[(twentieth$target==0),]
+twentieth_1_miss=twentieth_1[(twentieth_1$target==0),]
+```
+
+
+```{r}
+artist_pop = c(mean(sixties_miss$popularity),mean(seventies_miss$popularity),mean(eighties_miss$popularity),mean(nineties_miss$popularity),mean(twentieth_miss$popularity),mean(twentieth_1_miss$popularity))
+artist_pop
+instrumental = c(mean(sixties_miss$instrumentalness),mean(seventies_miss$instrumentalness),mean(eighties_miss$instrumentalness),mean(nineties_miss$instrumentalness),mean(twentieth_miss$instrumentalness),mean(twentieth_1_miss$instrumentalness))
+dance = c(mean(sixties_miss$danceability),mean(seventies_miss$danceability),mean(eighties_miss$danceability),mean(nineties_miss$danceability),mean(twentieth_miss$danceability),mean(twentieth_1_miss$danceability))
+energy = c(mean(sixties_miss$energy),mean(seventies_miss$energy),mean(eighties_miss$energy),mean(nineties_miss$energy),mean(twentieth_miss$energy),mean(twentieth_1_miss$energy))
+loud = c(mean(sixties_miss$loudness),mean(seventies_miss$loudness),mean(eighties_miss$loudness),mean(nineties_miss$loudness),mean(twentieth_miss$loudness),mean(twentieth_1_miss$loudness))
+mode = c(mean(sixties_miss$mode),mean(seventies_miss$mode),mean(eighties_miss$mode),mean(nineties_miss$mode),mean(twentieth_miss$mode),mean(twentieth_1_miss$mode))
+speech = c(mean(sixties_miss$speechiness),mean(seventies_miss$speechiness),mean(eighties_miss$speechiness),mean(nineties_miss$speechiness),mean(twentieth_miss$speechiness),mean(twentieth_1_miss$speechiness))
+acoustic = c(mean(sixties_miss$acousticness),mean(seventies_miss$acousticness),mean(eighties_miss$acousticness),mean(nineties_miss$acousticness),mean(twentieth_miss$acousticness),mean(twentieth_1_miss$acousticness))
+live = c(mean(sixties_miss$liveness),mean(seventies_miss$liveness),mean(eighties_miss$liveness),mean(nineties_miss$liveness),mean(twentieth_miss$liveness),mean(twentieth_1_miss$liveness))
+valence = c(mean(sixties_miss$valence),mean(seventies_miss$valence),mean(eighties_miss$valence),mean(nineties_miss$valence),mean(twentieth_miss$valence),mean(twentieth_1_miss$valence))
+tempo = c(mean(sixties_miss$tempo),mean(seventies_miss$tempo),mean(eighties_miss$tempo),mean(nineties_miss$tempo),mean(twentieth_miss$tempo),mean(twentieth_1_miss$tempo))
+duration = c(mean(sixties_miss$duration_ms),mean(seventies_miss$duration_ms),mean(eighties_miss$duration_ms),mean(nineties_miss$duration_ms),mean(twentieth_miss$duration_ms),mean(twentieth_1_miss$duration_ms))
+time_sig = c(mean(sixties_miss$time_signature),mean(seventies_miss$time_signature),mean(eighties_miss$time_signature),mean(nineties_miss$time_signature),mean(twentieth_miss$time_signature),mean(twentieth_1_miss$time_signature))
+genre = c(mean(sixties_miss$genre),mean(seventies_miss$genre),mean(eighties_miss$genre),mean(nineties_miss$genre),mean(twentieth_miss$genre),mean(twentieth_1_miss$genre))
+```
+
+```{r}
+x = c("1960-70", "1970-80", "1980-90", "1990-2000", "2000-10", "2010-20")
+```
+
+```{r}
+data1 <- data.frame(x = x, y = artist_pop)
+
+fig1 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig1 <- fig1 %>% layout(title = "Popularity",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+
+```{r}
+data1 <- data.frame(x = x, y = instrumental)
+
+fig2 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig2 <- fig2 %>% layout(title = "Instrumentalness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = dance)
+
+fig3 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig3 <- fig3 %>% layout(title = "Dance",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = energy)
+
+fig4 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig4 <- fig4 %>% layout(title = "Energy",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+
+```
+```{r}
+data1 <- data.frame(x = x, y = loud)
+
+fig5 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig5 <- fig1 %>% layout(title = "Loudness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = mode)
+
+fig6 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig6 <- fig6 %>% layout(title = "Mode",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = speech)
+
+fig7 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig7 <- fig7 %>% layout(title = "Speechiness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = acoustic)
+
+fig8 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig8 <- fig8 %>% layout(title = "Acousticness",
+         xaxis = list(title = "Decades"),     yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = live)
+
+fig9 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig9 <- fig9 %>% layout(title = "Liveliness",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = valence)
+
+fig9 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig9 <- fig9 %>% layout(title = "Valence",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = tempo)
+
+fig10 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig10 <- fig10 %>% layout(title = "Tempo",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = duration)
+
+fig11 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig11 <- fig11 %>% layout(title = "Duration",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = time_sig)
+
+fig12 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig12 <- fig12 %>% layout(title = "Time signature",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+data1 <- data.frame(x = x, y = genre)
+
+fig13 <- plot_ly(data1, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = c("#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585",
+                           "#FF1493")))
+fig13 <- fig13 %>% layout(title = "Genre",
+         xaxis = list(title = "Decades"),
+         yaxis = list(title = ""))
+```
+```{r}
+fig1
+fig2
+fig3
+fig4
+fig5
+fig6
+fig7
+fig8
+fig9
+fig10
+fig11
+fig12
+fig13
+```

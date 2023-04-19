@@ -1,0 +1,239 @@
+---
+title: "Untitled"
+author: "Priya"
+date: "2022-12-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(xgboost)
+library(caret)  
+library(e1071)    
+```
+
+```{r}
+d_ballad=read.csv("ballad_playlist_tracks_data.csv")
+d_ballad$genre="ballad"
+d_ballad
+d_country=read.csv("country_playlist_tracks_data.csv")
+d_country$genre="country"
+d_country
+d_pop=read.csv("dance pop_playlist_tracks_data.csv")
+d_pop$genre="dance pop"
+d_pop
+d_edm=read.csv("edm_playlist_tracks_data.csv")
+d_edm$genre="edm"
+d_edm
+d_indie=read.csv("indie_playlist_tracks_data.csv")
+d_indie$genre="indie"
+d_indie
+d_jazz=read.csv("Jazz_playlist_tracks_data.csv")
+d_jazz$genre="jazz"
+d_jazz
+d_karaoke=read.csv("karaoke_playlist_tracks_data.csv")
+d_karaoke$genre="karaoke"
+d_karaoke
+d_opm=read.csv("opm ost_playlist_tracks_data.csv")
+d_opm$genre="opm"
+d_opm
+d_punk=read.csv("Punk Rock_playlist_tracks_data.csv")
+d_punk$genre="punk"
+d_punk
+d_rap=read.csv("rap_playlist_tracks_data.csv")
+d_rap$genre="rap"
+d_rap
+d_rb=read.csv("rb_playlist_tracks_data.csv")
+d_rb$genre="rb"
+d_rb
+d_rock=read.csv("rock_playlist_tracks_data.csv")
+d_rock$genre="rock"
+d_rock
+```
+```{r}
+datagenre = rbind(d_ballad,d_country,d_pop,d_edm,d_indie,d_jazz,d_karaoke,d_opm,d_punk,d_rap,d_rb,d_rock)
+head(datagenre)
+gen_temp = datagenre$genre
+```
+```{r}
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+    #(x-mean(x))/sd(x)
+    #(x-(quantile(x)[2]))/((quantile(x)[4])-(quantile(x)[2]))
+}
+```
+
+```{r}
+datagenre$instrumentalness = format(datagenre$instrumentalness,scientific = F)
+datagenre$instrumentalness=round(as.double(substring(datagenre$instrumentalness,1,8)),4)
+```
+
+```{r}
+datagenre$loudness=round(min_max_normalisation(datagenre$loudness),4)
+datagenre$duration=round(min_max_normalisation(datagenre$duration),4)
+datagenre$tempo=round(min_max_normalisation(datagenre$tempo),4)
+```
+
+```{r}
+datagenre$genre=as.character(datagenre$genre)
+datagenre$genre=factor(datagenre$genre)
+datagenre$genre
+```
+```{r}
+parts = createDataPartition(datagenre$genre, p = 0.9, list = F)
+train = datagenre[parts, ]
+test = datagenre[-parts, ]
+
+X_train = data.matrix(train[,c(9:19)])                  # independent variables for train
+y_train = train$genre                                # dependent variables for train
+  
+X_test = data.matrix(test[,c(9:19)])                    # independent variables for test
+y_test = test$genre
+y_test
+```
+
+
+```{r}
+# dependent variables for test
+
+# convert the train and test data into xgboost matrix type.
+xgboost_train = xgb.DMatrix(data=X_train, label=y_train)
+xgboost_test = xgb.DMatrix(data=X_test, label=y_test)
+```
+
+```{r}
+xgboost_test
+```
+
+
+```{r}
+model <- xgboost(data = xgboost_train,                    # the data   
+                 max.depth=15,    
+                 eta=0.2 ,
+                 nrounds=500,
+                 objective ="multi:softmax",
+                 num_class=13 
+                 )                              # max number of boosting iterations
+
+#summary(model)
+```
+```{r}
+pred_test = predict(model, xgboost_test)
+
+pred_test
+```
+```{r}
+pred_test[(pred_test>12)] = 12
+pred_y = as.factor((levels(y_test))[round(abs(pred_test))])
+print(pred_y)
+```
+
+
+```{r}
+genre_map = data.frame(pred_test,pred_y)
+table(genre_map)
+table(pred_y)
+table(test$genre)
+```
+
+
+```{r}
+length(y_test)
+length(pred_y)
+conf_mat = confusionMatrix(y_test, pred_y)
+print(conf_mat)
+```
+```{r}
+var_imp=xgb.importance(model=model)
+```
+
+```{r}
+xgb.plot.importance(var_imp, col = "darkorchid")
+```
+
+
+```{r}
+head(datagenre)
+```
+
+
+
+
+```{r}
+d_genre = datagenre[datagenre$track_name %in% data$track, ]
+d_genre
+d_data = data[data$track %in% datagenre$track_name, ]
+d_data
+nrow(d_genre)
+nrow(d_data)
+head(data)
+d_data$genre = NA
+for(i in 1:nrow(d_data)){
+  d_data$genre[i] = d_genre$genre[d_genre$track_name == d_data$track[i]]
+}
+```
+```{r}
+d_data
+```
+```{r}
+d_data1=data[!(data$track %in% datagenre$track_name ),]
+d_data1
+```
+```{r}
+X_genre= data.matrix(d_data1[,c(4:14)])                    # independent variables for test
+```
+
+```{r}
+xgboost_test = xgb.DMatrix(data=X_genre)
+```
+
+
+```{r}
+pred_model = predict(model, xgboost_test)
+pred_model
+```
+```{r}
+pred_model[(pred_model>12)] = 12
+#y_test=datagenre$genre
+#pred_y = as.factor((levels(y_test))[round(abs(pred_model))])
+#print(pred_y)
+```
+
+```{r}
+d_data1$genre=pred_model
+d_data1
+#gen = d_data1$genre
+#find number of values in artists
+#length(artists)
+#find all unique values in artists
+#unique_artists = unique(artists)
+#length(unique_artists)
+#map all unique artists to a number
+#artist_map = as.data.frame(unique_artists)
+#artist_map$artist_id = 1:nrow(artist_map)
+#head(artist_map)
+#length(unique_artists)
+#replace artist names with artist ids
+#data$artist = as.character(data$artist)
+#for(i in 1:nrow(data)){
+  #data$artist[i] = artist_map$artist_id[artist_map$unique_artists == data$artist[i]]
+#}
+#head(data)
+```
+```{r}
+data=rbind(d_data,d_data1)
+data
+```
+
+
+
+```{r}
+head(data)
+write.csv(data,"data_with_genre.csv")
+```
+
+

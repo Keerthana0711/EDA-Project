@@ -1,0 +1,234 @@
+---
+title: "Prediction-with-Decade"
+author: "KEERTHANA S 20BCE1049"
+date: "2023-04-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data = read.csv("datasets/normalized_data.csv")
+data = data[, c(-2, -3, -4)]
+Y = data[, 17]
+data = data[, -17]
+data = cbind(data, target = Y)
+#Removing the above mentioned features
+data = data[, c(-4, -15, -16)]
+head(data)
+```
+
+
+```{r}
+data = data[order(data$X), ]
+head(data)
+```
+
+```{r}
+sixties = data[1:8642, ]
+temp = rep(1, 8642)
+sixties = cbind(sixties, decade = temp)
+dim(sixties)
+```
+
+```{r}
+seventies = data[8643:16408, ]
+temp = rep(2, 7766)
+seventies = cbind(seventies, decade = temp)
+dim(seventies)
+```
+
+
+```{r}
+eighties = data[16409:23316, ]
+temp = rep(3, 6908)
+eighties = cbind(eighties, decade = temp)
+dim(eighties)
+```
+
+```{r}
+nineties = data[23317:28836, ]
+temp = rep(4, 5520)
+nineties = cbind(nineties, decade = temp)
+dim(nineties)
+```
+
+```{r}
+twentieth = data[28837:34708, ]
+temp = rep(5, 5872)
+twentieth = cbind(twentieth, decade = temp)
+dim(twentieth)
+```
+
+
+```{r}
+twentieth_1 = data[34709:41106, ]
+temp = rep(6, 6398)
+twentieth_1 = cbind(twentieth_1, decade = temp)
+dim(twentieth_1)
+```
+
+```{r}
+Dataset = rbind(sixties, seventies, eighties, nineties, twentieth, twentieth_1)
+head(Dataset)
+tail(Dataset)
+Y = Dataset[, 16]
+Dataset = Dataset[, -16]
+Dataset = cbind(Dataset, target = Y)
+Dataset = Dataset[, -1]
+head(Dataset)
+dim(Dataset)
+```
+
+```{r}
+library('randomForest')
+```
+
+```{r}
+rfModel <-randomForest(target ~ danceability+energy+loudness+mode+speechiness+acousticness+instrumentalness+liveness+valence+tempo+duration_ms+time_signature+popularity+genre+decade, data = Dataset, ntree = 100, keep.forest=FALSE, importance=TRUE)
+```
+
+
+```{r}
+imp = importance(rfModel)
+imp
+```
+
+
+```{r}
+important <- importance(rfModel, type=1 )  #Author DataFlair
+Important_Features <- data.frame(Feature = row.names(important), Importance = important[, 1])
+#Author DataFlair
+library(ggplot2)
+```
+
+
+```{r}
+plot_ <- ggplot(Important_Features, 
+    aes(x= reorder(Feature,
+Importance) , y = Importance) ) +
+geom_bar(stat = "identity", 
+        fill = "lightskyblue") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Important Features in Random Forest\n") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+# **Prediction**
+
+```{r}
+library(caTools)
+data1 = Dataset
+data1$target=as.factor(data1$target)
+```
+
+
+```{r}
+split_rf <- sample.split(data1, SplitRatio = 0.8)
+#split
+  
+train_rf <- subset(data1, split_rf == "TRUE")
+test_rf <- subset(data1, split_rf == "FALSE")
+```
+
+
+```{r}
+set.seed(4)
+rf <- randomForest( target ~ ., 
+                    data = train_rf,
+                
+)
+rf
+```
+
+
+```{r}
+y_pred = predict(rf, newdata = test_rf[-16])
+```
+
+```{r}
+confusion_mtx = table(test_rf[,16], y_pred)
+confusion_mtx
+```
+
+```{r}
+acc=mean(y_pred!=test_rf$target)
+print(paste("Accuracy of the model:",1-acc))
+```
+
+```{r}
+library(caret)
+set.seed(123)
+rf1 <- randomForest(target ~ ., data = train_rf, mtry = 2, importance = TRUE)
+rf2 <- randomForest(target ~ ., data = train_rf, mtry = 3, importance = TRUE)
+rf3 <- randomForest(target ~ ., data = train_rf, mtry = 4, importance = TRUE)
+rf_list <- list(rf1, rf2, rf3)
+meta_rf <- train(target ~ ., data = train_rf, method = "rf", trControl = trainControl(method = "cv"), 
+                 tuneGrid = expand.grid(mtry = c(2, 3, 4)))
+```
+
+
+```{r}
+#acc=mean(preds!=data1$target)
+preds <- predict(meta_rf, test_rf)
+cm = table(preds, test_rf$target)
+cm
+crt = cm[1,1]+cm[2,2]
+acc = crt/(crt + cm[1,2]+cm[2,1])
+print(paste("Accuracy of the model:",acc))
+```
+
+
+
+```{r}
+df <- data1
+
+  # Now setup the translation vector - essentially a lookup table
+trans <- c("Miss","Hit")
+names(trans) <- c(0,1)
+
+# Now translate the values into a new column and print it out 
+df$target <- as.factor(trans[as.character(df$target) ])
+head(df)
+```
+
+
+
+```{r}
+library(caret)
+#df = iris
+roc_imp <- filterVarImp(x = df[, -ncol(df)], y = df$target)
+roc_imp = data.frame(Feature = row.names(roc_imp), Hit = roc_imp$Hit, Miss = roc_imp$Miss)
+roc_imp
+```
+
+```{r}
+plot_ <- ggplot(roc_imp, 
+    aes(x= reorder(Feature,
+Hit) , y = Hit) ) +
+geom_bar(stat = "identity", 
+        fill = "indianred") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Features influencing Hit of a song") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+
+
+
+
+
+
+
+

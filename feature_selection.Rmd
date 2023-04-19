@@ -1,0 +1,111 @@
+---
+title: "feature selection_lasso"
+author: "Priya"
+date: "2023-01-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data=read.csv("file_pop.csv")
+```
+
+```{r}
+#install.packages("glmnet")
+```
+
+
+```{r}
+library(glmnet)
+```
+
+```{r}
+head(data)
+```
+
+```{r}
+#Applying min-max normalization method
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+}
+```
+```{r}
+data$loudness = round(min_max_normalisation(data$loudness),4)
+data$duration_ms = round(min_max_normalisation(data$duration_ms),4)
+data$tempo = round(min_max_normalisation(data$tempo),4)
+data$chorus_hit = round(min_max_normalisation(data$chorus_hit),4)
+```
+```{r}
+#Converting scientific to numeric values
+data$instrumentalness = format(data$instrumentalness,scientific = F)
+data$instrumentalness = round(as.double(substring(data$instrumentalness,1,8)),4)
+data$acousticness = format(data$acousticness,scientific = F)
+data$acousticness = round(as.double(substring(data$acousticness,1,8)),4)
+
+```
+
+
+```{r}
+y=data$target
+x=data.frame(data[,c(5:22)])
+x=x[,-16]
+x
+```
+
+```{r}
+x = as.matrix(x)
+cv_model <- cv.glmnet(x, y, alpha = 0.05)
+plot(cv_model)
+```
+```{r}
+e=coef(cv_model)
+e
+e=abs(e)
+e
+```
+
+```{r}
+plot(e)
+```
+
+
+```{r}
+cv_model <- cv.glmnet(x, y, alpha = 0.1)
+plot(cv_model)
+```
+
+```{r}
+e=coef(cv_model)
+e
+e=abs(e)
+e
+```
+
+```{r}
+plot(e)
+```
+```{r}
+#install.packages("Boruta")
+```
+
+```{r}
+library(Boruta)
+x = as.data.frame(x)
+boruta_output <- Boruta(y ~ ., data=x, doTrace=2)
+boruta_signif <- names(boruta_output$finalDecision[boruta_output$finalDecision %in% c("Confirmed", "Tentative")]) 
+print(boruta_signif)
+```
+
+
+```{r}
+plot(boruta_output, cex.axis=0.7, las=2, xlab="", main="Variable Importance",color="violet") 
+```
+
+```{r}
+
+```
+
+

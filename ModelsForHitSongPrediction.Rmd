@@ -1,0 +1,335 @@
+---
+title: "Models For Hit Song Prediction"
+author: "KEERTHANA S 20BCE1049"
+date: "2023-02-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+# **Reading the dataset from pre-processed file**
+```{r}
+data = read.csv("Dataset.csv")
+head(data)
+```
+
+# **PCA**
+
+```{r}
+data.pr <- prcomp(data[c(1:14)], center = TRUE, scale = TRUE)
+summary(data.pr)
+pca_data = as.data.frame(data.pr$x)
+pca_data$target = data$target
+head(pca_data)
+```
+
+
+## **Loading necessary libraries**
+
+```{r}
+library(caTools)
+library(dplyr)
+library(tidyverse)
+library(keras)
+library(tensorflow)
+library(caret)
+```
+
+
+
+# **Logistic Regression**
+
+```{r}
+split <- sample.split(data, SplitRatio = 0.8)
+train = subset(data, split == "TRUE")
+test = subset(data, split == "FALSE")
+
+
+model <- glm(target ~ danceability+energy+loudness+mode+speechiness+acousticness+instrumentalness+liveness+valence+tempo+duration_ms+time_signature+genre+popularity, data = train, family = "binomial")
+model
+
+
+predict_val = predict(model, test, type="response")
+
+predict_val = ifelse(predict_val > 0.5, 1, 0)
+
+cm <- table(test$target, predict_val)
+cm
+
+err <- mean(predict_val != test$target)
+paste("Accuracy = ", 1-err)
+```
+
+```{r}
+#Logistic with PCA data
+set.seed(5)
+split <- sample.split(pca_data, SplitRatio = 0.8)
+pca_train = subset(pca_data, split == "TRUE")
+pca_test = subset(pca_data, split == "FALSE")
+
+
+model <- glm(target ~ PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10+PC11+PC12+PC13+PC14, data = pca_train, family = "binomial")
+model
+
+
+predict_val = predict(model, pca_test, type="response")
+
+predict_val = ifelse(predict_val > 0.5, 1, 0)
+
+cm <- table(pca_test$target, predict_val)
+cm
+
+err <- mean(predict_val != pca_test$target)
+paste("Accuracy = ", 1-err)
+```
+
+
+# **Mutli-layer Perceptron**
+
+```{r}
+set.seed(6)
+split_nn <- sample.split(data, SplitRatio = 0.8)
+train_nn = subset(data, split_nn == "TRUE")
+test_nn = subset(data, split_nn == "FALSE")
+```
+
+
+
+```{r}
+X_train <- train_nn %>% 
+  select(-target) %>% 
+  scale()
+
+y_train <- to_categorical(train_nn$target)
+```
+
+```{r}
+X_test <- test_nn %>% 
+  select(-target) %>% 
+  scale()
+
+y_test <- to_categorical(test_nn$target)
+```
+
+
+```{r}
+model3 <- keras_model_sequential() 
+
+model3 %>% 
+  layer_dense(units = 512, activation = 'relu', input_shape = ncol(X_train)) %>% 
+  layer_dropout(rate = 0.4) %>% 
+  layer_dense(units = 256, activation = 'relu') %>%
+  layer_dropout(rate = 0.3) %>%
+  layer_dense(units = 128, activation = 'relu') %>%
+  layer_dropout(rate = 0.3) %>%
+  layer_dense(units = 2, activation = 'sigmoid')
+
+history <- model3 %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = 'adam',
+  metrics = c('accuracy')
+)
+
+model3 %>% fit(
+  X_train, y_train, 
+  epochs = 100, 
+  batch_size = 5,
+  validation_data = list(X_test, y_test)
+)
+```
+
+
+```{r}
+model3 %>% evaluate(X_test, y_test)
+```
+
+
+```{r}
+predictions <- model3 %>% predict(X_test) %>% k_argmax() 
+predictions <- np_array(predictions)
+predictions <- reticulate::py_to_r(predictions) 
+```
+```{r}
+cm <- table(test_nn$target, predictions)
+confusionMatrix(cm)
+```
+
+
+
+# **Random Forest**
+
+```{r}
+data1 = data
+data1$target=as.factor(data1$target)
+```
+```{r}
+library(caTools)
+library(randomForest)
+```
+```{r}
+split_rf <- sample.split(data1, SplitRatio = 0.8)
+#split
+  
+train_rf <- subset(data1, split_rf == "TRUE")
+test_rf <- subset(data1, split_rf == "FALSE")
+```
+```{r}
+set.seed(4)
+rf <- randomForest( target ~ ., 
+                    data = train_rf,
+                
+)
+
+```
+
+```{r}
+rf
+```
+  
+```{r}
+y_pred = predict(rf, newdata = test_rf[-15])
+```
+```{r}
+confusion_mtx = table(test_rf[,15], y_pred)
+confusion_mtx
+```
+```{r}
+acc=mean(y_pred!=test_rf$target)
+print(paste("Accuracy of the model:",1-acc))
+```
+
+
+
+# **AdaBoost**
+
+```{r}
+library(adabag)
+```
+
+```{r}
+model = boosting(target~., data=train_rf, boos=TRUE, mfinal=50)
+
+```
+
+```{r}
+y_pred = predict(model,test_rf[-15])
+```
+```{r}
+confusion_mtx = table(test_rf[,15], y_pred$class)
+confusion_mtx
+```
+```{r}
+acc=mean(y_pred$class!=test_rf[,15])
+print(paste("Accuracy of the model:",1-acc))
+```
+
+
+
+# **Decision Tree**
+
+```{r}
+library(multcomp)
+library(party)
+library(e1071)
+library(xgboost)
+```
+
+
+```{r}
+#Splitting the data
+split_data = function(dt){
+  set.seed(1)
+  split = sample.split(dt,SplitRatio = 0.8)
+  train_d = subset(dt,split == "TRUE")
+  test_d = subset(dt,split == "FALSE")
+  ret = list("train" = train_d,"test"=test_d)
+  return(ret)
+}
+```
+
+
+    
+```{r}
+split_dt = split_data(data)
+train_dt = split_dt$train
+test_dt = split_dt$test
+```
+    
+```{r}
+modelTree = ctree(target ~ ., data = train_dt)
+```
+
+```{r}
+y_pred = predict(modelTree,newdata = test_dt)
+y_pred <- as.numeric(y_pred > 0.5)  
+cm = table(test_dt$target,y_pred)
+print(confusionMatrix(cm))
+```
+
+
+
+# **Naive Bayes**
+
+```{r}
+split_nb = split_data(data)
+train_nb = split_nb$train
+test_nb = split_nb$test
+```
+    
+```{r}
+#naive bayes
+modelNB = naiveBayes(target ~ ., data = train_nb)
+```
+
+```{r}
+y_pred_nb = predict(modelNB,newdata = test_nb)
+#y_pred_nb <- as.numeric(y_pred_nb > 0.5)  
+cm = table(test_nb$target,y_pred_nb)
+confusionMatrix(cm)
+```
+
+
+# **XGBoost**
+
+
+```{r}
+# Split the data into training and testing sets
+set.seed(123)
+split = split_data(data)
+train = split$train
+test = split$test
+# Create the XGBoost matrix objects for training and testing data
+x_train <- as.matrix(train[, -ncol(train)])
+y_train <- train$target
+x_test <- as.matrix(test[, -ncol(test)])
+y_test <- test$target
+
+# Train the XGBoost model
+model <- xgboost(data = x_train, label = y_train, max.depth = 3, eta = 0.1, nrounds = 500, objective = "binary:logistic")
+
+# Make predictions on the testing set
+y_pred <- predict(model, x_test)
+
+# Convert the predicted probabilities to class labels
+y_pred_class <- ifelse(y_pred > 0.5, 1, 0)
+
+# Calculate the accuracy of the model
+accuracy <- sum(y_pred_class == y_test) / length(y_test)
+print(paste("Accuracy:", accuracy))
+
+# Get the confusion matrix
+confusion_matrix <- table(y_test, y_pred_class)
+print("Confusion Matrix:")
+print(confusion_matrix)
+```
+
+
+
+
+

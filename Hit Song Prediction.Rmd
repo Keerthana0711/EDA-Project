@@ -1,0 +1,310 @@
+---
+title: "Hit Song Prediction"
+author: "KEERTHANA S_20BCE1049"
+date: "2022-12-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Predicting Hit Songs**
+
+## **Dataset**
+
+```{r}
+#Loading dataset
+data_sixties = read.csv("dataset-of-60s.csv")
+head(data_sixties)
+data_seventies = read.csv("dataset-of-70s.csv")
+head(data_seventies)
+data_eighties = read.csv("dataset-of-80s.csv")
+head(data_eighties)
+data_nineties = read.csv("dataset-of-90s.csv")
+head(data_nineties)
+data_twentieth = read.csv("dataset-of-00s.csv")
+head(data_twentieth)
+data_twentieth_1 = read.csv("dataset-of-10s.csv")
+head(data_twentieth_1)
+```
+
+
+## **Combining all the dataframes into a single dataset**
+
+```{r}
+data = rbind(data_sixties, data_seventies, data_eighties, data_nineties, data_twentieth, data_twentieth_1)
+head(data)
+```
+## **Understanding the dataset**
+
+```{r}
+dim(data)
+str(data)
+summary(data)
+```
+
+### **Checking for NA values in dataset**
+```{r}
+na_data = data[!complete.cases(data), ]
+dim(na_data)
+```
+### **From above, we can infer that there are no records with NA values**
+
+
+## **Adding Genre column to dataset**
+
+```{r}
+#Genre attribute is added by implementing a classification model and the results hav been written into a csv file which is read here for further process
+data_genre = read.csv("data_with_genre.csv")
+dim(data_genre)
+```
+
+## **Checking for duplicate records**
+
+```{r}
+dup = data_genre[duplicated(data_genre), ]
+dim(dup)
+```
+## **Removing the duplicate values from dataset**
+
+```{r}
+data_genre = data_genre[!duplicated(data_genre), ]
+dim(data_genre)   
+```
+
+
+## **Adding Popularity of Artist as an attribute to the existing dataset**
+
+```{r}
+data_artist=read.csv("artists.csv")
+```
+```{r}
+head(data_artist)
+```
+```{r}
+find_mode <- function(x) {
+  u <- unique(x)
+  tab <- tabulate(match(x, u))
+  u[tab == max(tab)]
+}
+```
+
+
+
+```{r}
+d_popularity = data_artist[data_artist$name %in% data_genre$artist, ]
+d_data = data_genre[data_genre$artist %in% data_artist$name, ]
+d_data_1 = data_genre[!(data_genre$artist %in% data_artist$name), ]
+nrow(d_popularity)
+nrow(d_data)
+head(data_genre)
+d_data$popularity = rep(0, length = nrow(d_data))
+d_data_1$popularity = rep(NA, length = nrow(d_data_1))
+for(i in 1:nrow(d_data)){
+  d_data$popularity[i] = d_popularity$popularity[d_popularity$name == d_data$artist[i]]
+}
+
+```
+
+
+### **Since adding atrist popularity attribute resulted in inducing NA values, imputation is carried out in order to remove it**
+
+```{r}
+#imputing data for missing data
+mode_pop = find_mode(d_data$popularity)
+d_data = rbind(d_data, d_data_1)
+head(d_data)
+dim(d_data)
+na_data = d_data[!complete.cases(d_data), ]
+dim(na_data)
+d_data$popularity[is.na(d_data$popularity) ] = mode_pop
+```
+
+
+
+**Writing the final data into csv file.**
+```{r}
+head(d_data)
+na_data = d_data[!complete.cases(d_data), ]
+dim(na_data)
+write.csv(d_data,"file_pop.csv", row.names = F)
+```
+```{r}
+songs_data = read.csv("file_pop.csv")
+head(songs_data)
+
+```
+
+
+
+## **Normalizing the dataset**
+
+```{r}
+#Applying min-max normalization method
+min_max_normalisation <- function(x) {
+    (x-min(x))/(max(x)-min(x))
+}
+```
+```{r}
+songs_data$loudness = round(min_max_normalisation(songs_data$loudness),4)
+songs_data$duration_ms = round(min_max_normalisation(songs_data$duration_ms),4)
+songs_data$tempo = round(min_max_normalisation(songs_data$tempo),4)
+songs_data$chorus_hit = round(min_max_normalisation(songs_data$chorus_hit),4)
+```
+```{r}
+#Converting scientific to numeric values
+songs_data$instrumentalness = format(songs_data$instrumentalness,scientific = F)
+songs_data$instrumentalness = round(as.double(substring(songs_data$instrumentalness,1,8)),4)
+
+```
+
+
+
+**Writing the normalized data into csv file for further usage**
+```{r}
+write.csv(songs_data,"datasets/normalized_data.csv",row.names = F)
+head(songs_data)
+na_data = songs_data[!complete.cases(songs_data), ]
+dim(na_data)
+```
+```{r}
+songs_data = read.csv("datasets/normalized_data.csv")
+head(songs_data)
+```
+
+
+
+## **Correlation**
+
+```{r}
+corr = cor(songs_data[, c(-1, -2, -3, -4, -5 )])
+corr
+corr = abs(corr)
+my_colors <- colorRampPalette(c("lightcyan", "mediumslateblue", "violetred", "navyblue"))
+heatmap(corr, col =  my_colors(250))
+```
+
+
+# **Feature Selection**
+## **Random Forest Method**
+
+```{r}
+X = songs_data[, c(-1, -2, -3, -4, -5, -22)]
+Y = songs_data[, 22]
+# Loading library
+library('randomForest')
+
+# Using random forest for variable selection
+rfModel <-randomForest(target ~ danceability+energy+key+loudness+mode+speechiness+acousticness+instrumentalness+liveness+valence+tempo+duration_ms+time_signature+chorus_hit+sections+popularity+genre, data = songs_data, ntree = 100, keep.forest=FALSE, importance=TRUE)
+
+
+# Getting the list of important variables
+imp = importance(rfModel)
+imp
+```
+
+```{r}
+important <- importance(rfModel, type=1 )  
+Important_Features <- data.frame(Feature = row.names(important), Importance = important[, 1])
+
+library(ggplot2)
+plot_ <- ggplot(Important_Features, 
+    aes(x= reorder(Feature,
+Importance) , y = Importance) ) +
+geom_bar(stat = "identity", 
+        fill = "darkcyan") +
+coord_flip() +
+theme_light(base_size = 20) +
+xlab("") + 
+ylab("Importance")+
+ggtitle("Important Features in Random Forest\n") +
+theme(plot.title = element_text(size=18))
+plot_
+```
+
+## **Boruta Method**
+```{r}
+y=songs_data$target
+x=data.frame(songs_data[,c(5:22)])
+x=x[,-16]
+#x
+```
+
+```{r}
+library(glmnet)
+X = as.matrix(x)
+cv_model <- cv.glmnet(X, y, alpha = 0.05)
+plot(cv_model)
+```
+```{r}
+e=coef(cv_model)
+e
+e=abs(e)
+e
+```
+
+```{r}
+plot(e)
+```
+
+
+```{r}
+cv_model <- cv.glmnet(X, y, alpha = 0.1)
+plot(cv_model)
+```
+
+```{r}
+e=coef(cv_model)
+e
+e=abs(e)
+e
+```
+
+```{r}
+plot(e)
+```
+```{r}
+#install.packages("Boruta")
+```
+
+```{r}
+library(Boruta)
+boruta_output <- Boruta(y ~ ., data=x, doTrace=2)
+boruta_signif <- names(boruta_output$finalDecision[boruta_output$finalDecision %in% c("Confirmed", "Tentative")]) 
+print(boruta_signif)
+```
+
+
+```{r}
+plot(boruta_output, cex.axis=0.7, las=2, xlab="", main="Variable Importance",color="thistle") 
+```
+
+
+
+# **Analysis from Feature Selectionn**
+
+**From the above feature selection methods, we can conclude that the influence of features key, sections and chorus_hit are negligible. So, for further analysis we can eliminate those features and proceed.**
+
+### **The dataset with final set of features is as follows**
+
+```{r}
+#Removing the Artist name, uri and other extra features
+Dataset = songs_data[, c(-1, -2, -3, -4)]
+Y = Dataset[, 16]
+Dataset = Dataset[, -16]
+Dataset = cbind(Dataset, target = Y)
+#Removing the above mentioned features
+Dataset = Dataset[, c(-3, -14, -15)]
+head(Dataset)
+#Writing into csv file
+write.csv(Dataset,"Dataset.csv", row.names = F)
+```
+
+```{r}
+#Checking the written csv file
+data = read.csv("Dataset.csv")
+head(data)
+```
+
+
